@@ -43,10 +43,16 @@ export class SlashCommand extends SlashCommandBuilder {
 
 	public run(onRun: SlashCommandRunFunc) {
 		this.onRun = onRun;
+		return this;
 	}
 
 	public getRunFunc() {
 		return this.onRun;
+	}
+
+	public async custom(func: (cmd: SlashCommand) => Promise<any>) {
+		await func(this);
+		return this;
 	}
 }
 
@@ -69,7 +75,12 @@ async function registerSlashCommands() {
 	if (!client.user?.id) return console.log('Client ID not found, make sure the bot logs in before running this');
 
 	const slashCommands = SlashCommand.slashCommands;
-	const jsonArray = Array.from(slashCommands.values()).map((cmd) => cmd.toJSON());
+	const jsonArray = Array.from(slashCommands.values()).map((cmd) => {
+		const json: any = cmd.toJSON();
+		json.integration_types = [0, 1];
+		json.contexts = [0, 1, 2];
+		return json;
+	});
 	if (slashCommands.size > 0) {
 		const response: any = await clientREST.put(Routes.applicationCommands(client.user.id), {
 			body: jsonArray,
