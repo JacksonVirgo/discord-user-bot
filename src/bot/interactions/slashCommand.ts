@@ -1,4 +1,4 @@
-import { CommandInteraction, Routes, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, CommandInteraction, Routes, SlashCommandBuilder } from 'discord.js';
 import { CustomID, Interaction } from '../interactionHandler';
 import { readdir } from 'node:fs/promises';
 import config from '../../utils/config';
@@ -23,7 +23,10 @@ export function validateCommandName(commandName: SlashCommandName): commandName 
 	return true;
 }
 
-export type SlashCommandRunFunc = (interaction: CommandInteraction) => Promise<any>;
+export interface SlashCommandData {
+	isUserCommand: boolean;
+}
+export type SlashCommandRunFunc = (interaction: CommandInteraction, data?: SlashCommandData) => Promise<any>;
 
 export class SlashCommand extends SlashCommandBuilder {
 	public static slashCommands = new Map<CustomID, SlashCommand>();
